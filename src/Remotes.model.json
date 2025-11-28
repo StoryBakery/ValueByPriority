@@ -1,0 +1,21 @@
+{
+    "className": "Folder",
+    "Children": [
+        {
+            "Name": "SyncFromServerEvent",
+            "className": "RemoteEvent"
+        },
+        {
+            "Name": "DesyncFromServerEvent",
+            "className": "RemoteEvent"
+        },
+        {
+            "Name": "UnreliableSyncFromServerEvent",
+            "className": "UnreliableRemoteEvent"
+        },
+        {
+            "Name": "ApplyInitialVbpEvent",
+            "className": "RemoteEvent"
+        }
+    ]
+}
