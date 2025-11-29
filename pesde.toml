@@ -1,27 +1,37 @@
 name = "story_bakery/value_by_priority"
 version = "0.1.0"
 license = "MIT"
-includes = ["pesde.toml", "LICENSE", "README.md", ".pesde/scripts/roblox_sync_config_generator.luau", ".pesde/scripts/sourcemap_generator.luau", "src/**/*.luau", "src/**/*.json", "tests/**/*.luau"]
+includes = [
+    "pesde.toml",
+    "LICENSE",
+    "README.md",
+    ".pesde/scripts/roblox_sync_config_generator.luau",
+    ".pesde/scripts/sourcemap_generator.luau",
+    "src/**/*.luau",
+    "src/**/*.json",
+    "tests/**/*.luau",
+]
 
 [target]
 environment = "roblox"
 lib = "src/init.luau"
-build_files = [
-    "src",
-]
+build_files = ["src"]
 
 [indices]
 default = "https://github.com/pesde-pkg/index"
 
+[wally_indices]
+default = "https://github.com/UpliftGames/wally-index"
+
 [dependencies]
-BufferBuilder = { workspace = "story_bakery/buffer_builder", version = "^" }
-BufferReader = { workspace = "story_bakery/buffer_reader", version = "^" }
-ReplicatedInstanceId = { workspace = "story_bakery/replicated_instance_id", version = "^" }
-TableUtil = { workspace = "story_bakery/table_util", version = "^" }
-Signal = { workspace = "story_bakery/signal", version = "^" }
-Maid = { workspace = "story_bakery/maid", version = "^" }
-LinearInterpolation = { workspace = "story_bakery/linear_interpolation", version = "^" }
-TypeInfos = { name = "story_bakery/type_infos", version = "^0.1.0" }
+BufferBuilder = { repo = "Story-Bakery/BufferBuilder", rev = "main" }
+BufferReader = { repo = "Story-Bakery/BufferReader", rev = "main" }
+ReplicatedInstanceId = { repo = "Story-Bakery/ReplicatedInstanceId", rev = "main" }
+TableUtil = { repo = "Story-Bakery/TableUtil", rev = "main" }
+Signal = { repo = "Story-Bakery/Signal", rev = "main" }
+Maid = { repo = "Story-Bakery/Maid", rev = "main" }
+LinearInterpolation = { repo = "Story-Bakery/LinearInterpolation", rev = "main" }
+TypeInfos = { repo = "Story-Bakery/TypeInfos", rev = "main" }
 
 [scripts]
 roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
