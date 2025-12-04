@@ -24,14 +24,14 @@ default = "https://github.com/pesde-pkg/index"
 default = "https://github.com/UpliftGames/wally-index"
 
 [dependencies]
-BufferBuilder = { repo = "Story-Bakery/BufferBuilder", rev = "main" }
-BufferReader = { repo = "Story-Bakery/BufferReader", rev = "main" }
-ReplicatedInstanceId = { repo = "Story-Bakery/ReplicatedInstanceId", rev = "main" }
-TableUtil = { repo = "Story-Bakery/TableUtil", rev = "main" }
-Signal = { repo = "Story-Bakery/Signal", rev = "main" }
-Maid = { repo = "Story-Bakery/Maid", rev = "main" }
-LinearInterpolation = { repo = "Story-Bakery/LinearInterpolation", rev = "main" }
-TypeInfos = { repo = "Story-Bakery/TypeInfos", rev = "main" }
+BufferBuilder = { repo = "StoryBakery/BufferBuilder", rev = "main" }
+BufferReader = { repo = "StoryBakery/BufferReader", rev = "main" }
+ReplicatedInstanceId = { repo = "StoryBakery/ReplicatedInstanceId", rev = "main" }
+TableUtil = { repo = "StoryBakery/TableUtil", rev = "main" }
+Signal = { repo = "StoryBakery/Signal", rev = "main" }
+Maid = { repo = "StoryBakery/Maid", rev = "main" }
+LinearInterpolation = { repo = "StoryBakery/LinearInterpolation", rev = "main" }
+TypeInfos = { repo = "StoryBakery/TypeInfos", rev = "main" }
 
 [scripts]
 roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
