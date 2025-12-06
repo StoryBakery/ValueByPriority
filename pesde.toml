@@ -24,17 +24,21 @@ default = "https://github.com/pesde-pkg/index"
 default = "https://github.com/UpliftGames/wally-index"
 
 [dependencies]
-BufferBuilder = { repo = "StoryBakery/BufferBuilder", rev = "main" }
-BufferReader = { repo = "StoryBakery/BufferReader", rev = "main" }
-ReplicatedInstanceId = { repo = "StoryBakery/ReplicatedInstanceId", rev = "main" }
-TableUtil = { repo = "StoryBakery/TableUtil", rev = "main" }
-Signal = { repo = "StoryBakery/Signal", rev = "main" }
-Maid = { repo = "StoryBakery/Maid", rev = "main" }
-LinearInterpolation = { repo = "StoryBakery/LinearInterpolation", rev = "main" }
-TypeInfos = { repo = "StoryBakery/TypeInfos", rev = "main" }
+BufferBuilder = { repo = "https://github.com/StoryBakery/BufferBuilder", rev = "main" }
+BufferReader = { repo = "https://github.com/StoryBakery/BufferReader", rev = "main" }
+ReplicatedInstanceId = { repo = "https://github.com/StoryBakery/ReplicatedInstanceId", rev = "main" }
+TableUtil = { repo = "https://github.com/StoryBakery/TableUtil", rev = "main" }
+Signal = { repo = "https://github.com/StoryBakery/Signal", rev = "main" }
+Maid = { repo = "https://github.com/StoryBakery/Maid", rev = "main" }
+LinearInterpolation = { repo = "https://github.com/StoryBakery/LinearInterpolation", rev = "main" }
+TypeInfos = { repo = "https://github.com/StoryBakery/TypeInfos", rev = "main" }
 
 [scripts]
 roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
+sourcemap_generator = ".pesde/scripts/sourcemap_generator.luau"
+
+[dev_dependencies]
+scripts = { name = "pesde/scripts_rojo", version = "^0.2.0", target = "lune" }
 
 [engines]
 pesde = "^0.7.0"
