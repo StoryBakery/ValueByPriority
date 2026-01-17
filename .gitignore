@@ -19,7 +19,6 @@ roblox_packages/
 
 # Pesde
 .pesde/
-pesde.lock # 다른 패키지를 참조힐 때도, 최신 버전으로 계속 쓸 수 있게 하기 위함입니다, 마이너나 패치의 경우엔 API 가 바뀌지 않는 것이 정석
 
 # Wally
 /Packages
