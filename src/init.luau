@@ -8,7 +8,7 @@ local RunService = game:GetService("RunService")
 local BufferBuilder = require("./roblox_packages/BufferBuilder")
 local BufferReader = require("./roblox_packages/BufferReader")
 local LinearInterpolation = require("./roblox_packages/LinearInterpolation")
-local Promise = require("./roblox_packages/Promise")
+local Promise = require("./roblox_packages/promise")
 local Signal = require("./roblox_packages/Signal")
 local TableUtil = require("./roblox_packages/TableUtil")
 
