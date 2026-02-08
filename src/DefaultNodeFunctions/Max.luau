@@ -1,7 +1,7 @@
 --!native
 local Max = {}
 
-type MaxFunc<T> = (a: T, b: T)->(T)
+type MaxFunc<T> = (a: T, b: T) -> T
 
 function Max.byType<T>(a: T, b: T): T
 	local t = typeof(a)
@@ -9,7 +9,7 @@ function Max.byType<T>(a: T, b: T): T
 	if func then
 		return func(a, b)
 	else
-		error("No interpolation function found for type: "..t)
+		error("No interpolation function found for type: " .. t)
 	end
 end
 
@@ -35,18 +35,11 @@ Max.UDim2 = function(a: UDim2, b: UDim2)
 end
 
 Max.UDim = function(a: UDim, b: UDim)
-	return UDim.new(
-		math.max(a.Scale, b.Scale),
-		math.max(a.Offset, b.Offset)
-	)
+	return UDim.new(math.max(a.Scale, b.Scale), math.max(a.Offset, b.Offset))
 end
 
 Max.Color3 = function(a: Color3, b: Color3)
-	return Color3.new(
-		math.max(a.R, b.R),
-		math.max(a.G, b.G),
-		math.max(a.B, b.B)
-	)
+	return Color3.new(math.max(a.R, b.R), math.max(a.G, b.G), math.max(a.B, b.B))
 end
 
 return Max

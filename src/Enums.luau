@@ -1,4 +1,3 @@
-
 local TableUtil = require("../roblox_packages/TableUtil")
 
 local Enums = {

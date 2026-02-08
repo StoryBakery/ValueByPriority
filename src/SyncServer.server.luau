@@ -1,12 +1,12 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local AuroraClock = require("../roblox_packages/AuroraClock")
 local BufferBuilder = require("../roblox_packages/BufferBuilder")
 local BufferReader = require("../roblox_packages/BufferReader")
 local Maid = require("../roblox_packages/Maid")
 local Signal = require("../roblox_packages/Signal")
 local TableUtil = require("../roblox_packages/TableUtil")
-local AuroraClock = require("../roblox_packages/AuroraClock")
 
 local ValueByPriority = require("./")
 local ValueByPriorityObserver = require("./Observer")
@@ -27,7 +27,8 @@ local observerContextsByPlayerAndVbpId: {
 	[Player]: { [string]: ObserverContext },
 } = {}
 
-local queuedReliableChangeInfoByPlayerAndVbpId: { [Player]: { [string]: ValueByPriorityObserver.VbpChangeInfo } } = {}
+local queuedReliableChangeInfoByPlayerAndVbpId: { [Player]: { [string]: ValueByPriorityObserver.VbpChangeInfo } } =
+	{}
 local queuedUnreliableChangeInfosByPlayerAndVbpId: { [Player]: { [string]: ValueByPriorityObserver.VbpChangeInfo } } =
 	{}
 
@@ -251,7 +252,10 @@ end
 	초기 상태 정보를 클라이언트로 전송합니다. 이후 변경 사항은 큐를 통해 관리됩니다.
 ]]
 
-local function createObserverContext(player: Player, vbp: ValueByPriority.ValueByPriority): ObserverContext
+local function createObserverContext(
+	player: Player,
+	vbp: ValueByPriority.ValueByPriority
+): ObserverContext
 	local observer = ValueByPriorityObserver.fromValueByPriority(vbp)
 
 	local maid = Maid.new()
@@ -271,10 +275,11 @@ local function createObserverContext(player: Player, vbp: ValueByPriority.ValueB
 	}
 end
 
-local initialInfoBuilderContextsByPlayer = {} :: { [Player]: {
-	Count: number,
-	Builder: BufferBuilder.BufferBuilder,
-} }
+local initialInfoBuilderContextsByPlayer =
+	{} :: { [Player]: {
+		Count: number,
+		Builder: BufferBuilder.BufferBuilder,
+	} }
 local function onRequestedSyncFromServer(player: Player, idsToSyncBuffer: buffer)
 	local reader = BufferReader.fromBuffer(idsToSyncBuffer)
 	local length = buffer.len(idsToSyncBuffer)

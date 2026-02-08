@@ -1,7 +1,7 @@
 --!native
 local Scale = {}
 
-type ScaleFunc<T> = (value: T, scale: number)->(T)
+type ScaleFunc<T> = (value: T, scale: number) -> T
 
 function Scale.byType<T>(value: T, scale: number): T
 	local t = typeof(value)
@@ -9,7 +9,7 @@ function Scale.byType<T>(value: T, scale: number): T
 	if func then
 		return func(value, scale)
 	else
-		error("No interpolation function found for type: "..t)
+		error("No interpolation function found for type: " .. t)
 	end
 end
 
@@ -30,7 +30,7 @@ Scale.NumberSequence = function(value: NumberSequence, scale: number): NumberSeq
 	local newKeypoints = table.create(#keypoints)
 	for i, keypoint in ipairs(keypoints) do
 		newKeypoints[i] = NumberSequenceKeypoint.new(
-			keypoint.Time, 
+			keypoint.Time,
 			keypoint.Value * scale,
 			keypoint.Envelope * scale
 		)

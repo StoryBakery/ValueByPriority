@@ -1,7 +1,7 @@
 --!native
 local Min = {}
 
-type MinFunc<T> = (a: T, b: T)->(T)
+type MinFunc<T> = (a: T, b: T) -> T
 
 function Min.byType<T>(a: T, b: T): T
 	local t = typeof(a)
@@ -9,7 +9,7 @@ function Min.byType<T>(a: T, b: T): T
 	if func then
 		return func(a, b)
 	else
-		error("No interpolation function found for type: "..t)
+		error("No interpolation function found for type: " .. t)
 	end
 end
 
@@ -35,18 +35,11 @@ Min.UDim2 = function(a: UDim2, b: UDim2)
 end
 
 Min.UDim = function(a: UDim, b: UDim)
-	return UDim.new(
-		math.min(a.Scale, b.Scale),
-		math.min(a.Offset, b.Offset)
-	)
+	return UDim.new(math.min(a.Scale, b.Scale), math.min(a.Offset, b.Offset))
 end
 
 Min.Color3 = function(a: Color3, b: Color3)
-	return Color3.new(
-		math.min(a.R, b.R),
-		math.min(a.G, b.G),
-		math.min(a.B, b.B)
-	)
+	return Color3.new(math.min(a.R, b.R), math.min(a.G, b.G), math.min(a.B, b.B))
 end
 
 return Min

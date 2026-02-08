@@ -1,5 +1,5 @@
 name = "storybakery/value_by_priority"
-version = "0.1.0"
+version = "0.1.1"
 license = "MIT"
 includes = [
     "pesde.toml",
@@ -24,14 +24,14 @@ default = "https://github.com/pesde-pkg/index"
 default = "https://github.com/UpliftGames/wally-index"
 
 [dependencies]
-BufferBuilder = { repo = "https://github.com/StoryBakery/BufferBuilder", rev = "main" }
+BufferBuilder = { repo = "https://github.com/StoryBakery/BufferBuilder", rev = "02a2fb0180137fce712100a8b205ef4b8d5e5752" }
 BufferReader = { repo = "https://github.com/StoryBakery/BufferReader", rev = "main" }
-ReplicatedInstanceId = { repo = "https://github.com/StoryBakery/ReplicatedInstanceId", rev = "main" }
-TableUtil = { repo = "https://github.com/StoryBakery/TableUtil", rev = "main" }
-Signal = { repo = "https://github.com/StoryBakery/Signal", rev = "main" }
-Maid = { repo = "https://github.com/StoryBakery/Maid", rev = "main" }
-LinearInterpolation = { repo = "https://github.com/StoryBakery/LinearInterpolation", rev = "main" }
-TypeInfos = { repo = "https://github.com/StoryBakery/TypeInfos", rev = "main" }
+ReplicatedInstanceId = { repo = "https://github.com/StoryBakery/ReplicatedInstanceId", rev = "acf7dc27b7dfd6058aaf8b29833f132a71c0e445" }
+TableUtil = { repo = "https://github.com/StoryBakery/TableUtil", rev = "961700292dd382b062955e16cac7ccccc361cdfa" }
+Signal = { repo = "https://github.com/StoryBakery/Signal", rev = "15e95d125e3c7c1a487c86da30608c5f7dc4b1f3" }
+Maid = { repo = "https://github.com/StoryBakery/Maid", rev = "0fc3dddb5b709f30c90cf0d63f031113c26ce207" }
+LinearInterpolation = { repo = "https://github.com/StoryBakery/LinearInterpolation", rev = "c522819b5515edb45f1518244252f58c8f9e05ee" }
+TypeInfos = { repo = "https://github.com/StoryBakery/TypeInfos", rev = "a7362072a5afd85bee6583f05398a09438a039b5" }
 
 [scripts]
 roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
@@ -40,6 +40,8 @@ sourcemap_generator = ".pesde/scripts/sourcemap_generator.luau"
 [dev_dependencies]
 scripts = { name = "pesde/scripts_rojo", version = "^0.2.0", target = "lune" }
 rojo = { name = "pesde/rojo", version = "^7.5.1", target = "lune" }
+setup-project-configs = { repo = "https://github.com/StoryBakery/setup-project-configs", rev = "8e77c9722c25b0a4ea6ed1415ab18fc8db2ff9e2" }
+pesde-gitrev = { repo = "https://github.com/StoryBakery/pesde-gitrev", rev = "a2d6f1e71ac6264ff2b48fd2178271f80135772e" }
 
 [engines]
 pesde = "^0.7.0"

@@ -1,17 +1,16 @@
 local RunService = game:GetService("RunService")
 
-
 local BufferBuilder = require("../roblox_packages/BufferBuilder")
 local BufferReader = require("../roblox_packages/BufferReader")
-local TypeInfos = require("../roblox_packages/TypeInfos")
-local ReplicatedInstanceId = require("../roblox_packages/ReplicatedInstanceId")
-local TableUtil = require("../roblox_packages/TableUtil")
-local Signal = require("../roblox_packages/Signal")
 local Maid = require("../roblox_packages/Maid")
+local ReplicatedInstanceId = require("../roblox_packages/ReplicatedInstanceId")
+local Signal = require("../roblox_packages/Signal")
+local TableUtil = require("../roblox_packages/TableUtil")
+local TypeInfos = require("../roblox_packages/TypeInfos")
 
 local NIL_IDENTIFIER = {}
 
-local ValueByPriority = require(script.Parent)
+local ValueByPriority = require("./")
 
 local ValueByPriorityObserver = {}
 ValueByPriorityObserver.__index = ValueByPriorityObserver
@@ -21,18 +20,17 @@ ValueByPriorityObserver.NIL_IDENTIFIER = NIL_IDENTIFIER
 
 --#region Types
 
-
 export type RecordStepEvent = Signal.Signal | RBXScriptSignal
 export type VbpChangeInfo = {
 	IsDestroyed: boolean?,
 	DefaultValue: any?,
 	IsDefaultValueReliable: boolean?,
 	ReliableNodeChangeInfosById: {
-		[number]: ReliableNodeChangeInfo?
+		[number]: ReliableNodeChangeInfo?,
 	}?,
 	UnreliableNodeChangeInfosById: {
-		[number]: UnreliableNodeChangeInfo?
-	}?
+		[number]: UnreliableNodeChangeInfo?,
+	}?,
 }
 export type ReliableNodeChangeInfo = {
 	IsDestroyed: boolean?,
@@ -40,12 +38,12 @@ export type ReliableNodeChangeInfo = {
 	Priority: number?,
 	Value: any?,
 	NodeFunction: ValueByPriority.NodeFunction?,
-	CustomData: {[string]: any}?,
+	CustomData: { [string]: any }?,
 }
 export type UnreliableNodeChangeInfo = {
 	Value: any?,
 	NodeFunction: ValueByPriority.NodeFunction?,
-	CustomData: {[string]: any}?,
+	CustomData: { [string]: any }?,
 }
 
 export type ValueByPriorityObserverParams = {
@@ -93,37 +91,34 @@ function ValueByPriorityObserver.fromValueByPriority(
 	return self
 end
 
-
---#tag Listen Vbp 
+--#tag Listen Vbp
 function ValueByPriorityObserver:_connectVbpListeners()
 	local vbp = self.ValueByPriority
-	
-	self.Maid:GiveTask(vbp.DefaultValueChanged:ConnectUnyielding(function(newValue) 
-		self:_recordDefaultValueChange(vbp, newValue) 
+
+	self.Maid:GiveTask(vbp.DefaultValueChanged:ConnectUnyielding(function(newValue)
+		self:_recordDefaultValueChange(vbp, newValue)
 	end))
-	
+
 	self.Maid:GiveTask(vbp.Destroying:ConnectUnyielding(function()
-		self:_onVbpDestroying() 
+		self:_onVbpDestroying()
 	end))
-	
+
 	self.Maid:GiveTask(vbp.NodeAdded:ConnectUnyielding(function(node)
 		if node.NotReplicated then
 			return
 		end
-		
+
 		self:_connectNodeListeners(node)
 	end))
-	
+
 	for nodeId, node in self.ValueByPriority.NodesById do
 		if node.NotReplicated then
 			continue
 		end
-		
+
 		self:_connectNodeListeners(node)
 	end
 end
-
-
 
 --#tag Record Changes
 --[[
@@ -144,25 +139,27 @@ function ValueByPriorityObserver:_connectNodeListeners(node: ValueByPriority.Nod
 	self:_recordOnNodeAdded(node)
 
 	local nodeMaid = Maid.new()
-	
+
 	nodeMaid:GiveTask(node.PriorityChanged:ConnectUnyielding(function(newPriority)
-		self:_recordNodePriorityChange(node, newPriority) 
+		self:_recordNodePriorityChange(node, newPriority)
 	end))
 	nodeMaid:GiveTask(node.ValueChanged:ConnectUnyielding(function(newValue)
-		self:_recordNodeValueChange(node, newValue) 
+		self:_recordNodeValueChange(node, newValue)
 	end))
 	nodeMaid:GiveTask(node.CustomDataChanged:ConnectUnyielding(function(key, value)
-		self:_recordNodeCustomDataChange(node, key, value) 
+		self:_recordNodeCustomDataChange(node, key, value)
 	end))
 	nodeMaid:GiveTask(node.Destroying:ConnectUnyielding(function()
 		nodeMaid:Destroy()
 		self:_recordOnNodeRemoved(node)
 	end))
-	
+
 	self.Maid:GiveTask(nodeMaid)
 end
 
-function ValueByPriorityObserver:_findOrCreateReliableNodeChangeInfosById(): {[number]: ReliableNodeChangeInfo}
+function ValueByPriorityObserver:_findOrCreateReliableNodeChangeInfosById(): {
+	[number]: ReliableNodeChangeInfo,
+}
 	local reliableNodeChangeInfosById = self._changeInfo.ReliableNodeChangeInfosById
 	if reliableNodeChangeInfosById then
 		return reliableNodeChangeInfosById
@@ -183,7 +180,9 @@ function ValueByPriorityObserver:_findOrCreateReliableNodeChangeInfo(
 	return nodeChangeInfo
 end
 
-function ValueByPriorityObserver:_findOrCreateUnreliableNodeChangeInfosById(): {[number]: UnreliableNodeChangeInfo}
+function ValueByPriorityObserver:_findOrCreateUnreliableNodeChangeInfosById(): {
+	[number]: UnreliableNodeChangeInfo,
+}
 	local unreliableNodeChangeInfosById = self._changeInfo.UnreliableNodeChangeInfosById
 	if unreliableNodeChangeInfosById then
 		return unreliableNodeChangeInfosById
@@ -207,13 +206,13 @@ end
 --#tag Added
 function ValueByPriorityObserver:_recordOnNodeAdded(node)
 	local changeInfo = self:_findOrCreateReliableNodeChangeInfo(node._nodeId)
-	
+
 	changeInfo.IsAdded = true
 	changeInfo.Priority = node.Priority
 	changeInfo.NodeFunction = node.NodeFunction
 	changeInfo.Value = node:GetValue()
 	changeInfo.CustomData = table.clone(node.CustomData)
-	
+
 	self:_readyToRecordChange()
 end
 
@@ -221,38 +220,33 @@ end
 function ValueByPriorityObserver:_recordOnNodeRemoved(node: ValueByPriority.Node)
 	local changeInfo = self:_findOrCreateReliableNodeChangeInfo(node._nodeId)
 	changeInfo.IsDestroyed = true
-	
+
 	if self._changeInfo.UnreliableNodeChangeInfosById then
 		self._changeInfo.UnreliableNodeChangeInfosById[node._nodeId] = nil
 	end
-	
+
 	self:_readyToRecordChange()
 end
 
 --#tag Priority
 function ValueByPriorityObserver:_recordNodePriorityChange(
-	node: ValueByPriority.Node, 
+	node: ValueByPriority.Node,
 	priority: number
 )
 	local changeInfo = self:_findOrCreateReliableNodeChangeInfo(node._nodeId)
 	changeInfo.Priority = priority
-	
+
 	self:_readyToRecordChange()
 end
 
 --#tag Value
-function ValueByPriorityObserver:_recordNodeValueChange(
-	node: ValueByPriority.Node, 
-	value: any
-)
+function ValueByPriorityObserver:_recordNodeValueChange(node: ValueByPriority.Node, value: any)
 	local changeInfo = if node.Reliability == "Reliable"
 		then self:_findOrCreateReliableNodeChangeInfo(node._nodeId)
 		else self:_findOrCreateUnreliableNodeChangeInfo(node._nodeId)
-	
-	changeInfo.Value = if value == nil
-		then NIL_IDENTIFIER
-		else value
-	
+
+	changeInfo.Value = if value == nil then NIL_IDENTIFIER else value
+
 	--[[
 		Serializer 에서 NodeFunction 에 따라, 
 		값이 바뀔 때 TypeId 등을 첨부하지 않아도 될 수 있으므로, 
@@ -261,14 +255,14 @@ function ValueByPriorityObserver:_recordNodeValueChange(
 		Unreliable 이어도 마찬가지.
 	]]
 	changeInfo.NodeFunction = node.NodeFunction
-	
+
 	self:_readyToRecordChange()
 end
 
 --#tag CustomData
 function ValueByPriorityObserver:_recordNodeCustomDataChange(
 	node: ValueByPriority.Node,
-	key: string, 
+	key: string,
 	value: any
 )
 	local changeInfo = if node.Reliability == "Reliable"
@@ -280,19 +274,16 @@ function ValueByPriorityObserver:_recordNodeCustomDataChange(
 		customData = {}
 		changeInfo.CustomData = customData
 	end
-	
-	customData[key] = if value == nil
-		then NIL_IDENTIFIER
-		else value
-	
+
+	customData[key] = if value == nil then NIL_IDENTIFIER else value
+
 	self:_readyToRecordChange()
 end
 
 --#tag Destroying
 function ValueByPriorityObserver:_onVbpDestroying()
-
-	self._changeInfo = { 
-		IsDestroyed = true 
+	self._changeInfo = {
+		IsDestroyed = true,
 	}
 
 	self:_readyToRecordChange()
@@ -305,7 +296,7 @@ function ValueByPriorityObserver:_readyToRecordChange()
 		return
 	end
 	self._isReadyToRecord = true
-	
+
 	self.RecordStepEvent:Once(function()
 		self.ChangeRecorded:Fire(self._changeInfo)
 		self._changeInfo = {}
@@ -313,17 +304,15 @@ function ValueByPriorityObserver:_readyToRecordChange()
 	end)
 end
 
-
 --#region Methods
 -- Observer 객체 정리
 function ValueByPriorityObserver:Destroy()
-	if self.IsDestroyed then 
-		return 
+	if self.IsDestroyed then
+		return
 	end
 	self.IsDestroyed = true
 
 	self.Maid:Destroy()
-
 end
 
 --#region Functions
@@ -331,17 +320,20 @@ end
 --#region SeparateChangeInfoIntoReliableAndUnreliable
 function ValueByPriorityObserver.SeparateChangeInfoIntoReliableAndUnreliable(
 	changeInfo: VbpChangeInfo
-): (VbpChangeInfo?, VbpChangeInfo?)
-	
+): (
+	VbpChangeInfo?,
+	VbpChangeInfo?
+)
 	local reliableChangeInfo = {} :: VbpChangeInfo?
 	reliableChangeInfo.IsDestroyed = changeInfo.IsDestroyed
 	reliableChangeInfo.ReliableNodeChangeInfosById = changeInfo.ReliableNodeChangeInfosById
-	
-	local unreliableChangeInfo = {} 
+
+	local unreliableChangeInfo = {}
 	if changeInfo.UnreliableNodeChangeInfosById then
-		unreliableChangeInfo.UnreliableNodeChangeInfosById = changeInfo.UnreliableNodeChangeInfosById
+		unreliableChangeInfo.UnreliableNodeChangeInfosById =
+			changeInfo.UnreliableNodeChangeInfosById
 	end
-	
+
 	if changeInfo.DefaultValue ~= nil then
 		if changeInfo.IsDefaultValueReliable then
 			reliableChangeInfo.DefaultValue = changeInfo.DefaultValue
@@ -356,7 +348,7 @@ function ValueByPriorityObserver.SeparateChangeInfoIntoReliableAndUnreliable(
 	if next(unreliableChangeInfo) == nil then
 		reliableChangeInfo = nil
 	end
-	
+
 	return reliableChangeInfo, unreliableChangeInfo
 end
 

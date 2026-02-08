@@ -1,12 +1,10 @@
-
-
 local BufferBuilder = require("../roblox_packages/BufferBuilder")
 local BufferReader = require("../roblox_packages/BufferReader")
-local TypeInfos = require("../roblox_packages/TypeInfos")
-local ReplicatedInstanceId = require("../roblox_packages/ReplicatedInstanceId")
-local TableUtil = require("../roblox_packages/TableUtil")
-local Signal = require("../roblox_packages/Signal")
 local Maid = require("../roblox_packages/Maid")
+local ReplicatedInstanceId = require("../roblox_packages/ReplicatedInstanceId")
+local Signal = require("../roblox_packages/Signal")
+local TableUtil = require("../roblox_packages/TableUtil")
+local TypeInfos = require("../roblox_packages/TypeInfos")
 
 local ValueByPriority = require("./")
 local ValueByPriorityObserver = require("./Observer")
@@ -21,7 +19,8 @@ local NIL_IDENTIFIER = ValueByPriorityObserver.NIL_IDENTIFIER
 	그래서 Enum 타입인지 읽고, Enum 이면 추가적인 바이트를 한 번 더 일게 합니다.
 ]]
 local ENUM_TYPE_INFO_ID
-local typeIdsByName, typeNamesById = {}, {} do
+local typeIdsByName, typeNamesById = {}, {}
+do
 	local nextTypeInfoId = 0
 	for typeName, typeInfo in TypeInfos.GetTypeInfosByName() do
 		if typeInfo.IsEnum then
@@ -42,7 +41,8 @@ local typeIdsByName, typeNamesById = {}, {} do
 	end
 end
 
-local enumTypeIdsByName, enumTypeNamesById = {}, {} do
+local enumTypeIdsByName, enumTypeNamesById = {}, {}
+do
 	local id = 0
 	for typeName, typeInfo in TypeInfos.GetTypeInfosByName() do
 		if not typeInfo.IsEnum then
@@ -60,15 +60,12 @@ for name, id in ValueByPriority.NodeFunctionIdsByName do
 end
 
 local function mapNilIdentifierToNil(value)
-	return if value == NIL_IDENTIFIER
-		then nil
-		else value
+	return if value == NIL_IDENTIFIER then nil else value
 end
 
 export type SerializeParams = {
 	ExcludesTypeId: boolean?,
 }
-
 
 --#1 Functions
 --#region BuildInitialInfo
@@ -80,8 +77,8 @@ function ValueByPrioritySerializer.BuildInitialInfo(
 	params: BuildInitalInfoParams?
 )
 	local params = params or {}
-	
-		bufBuilder:WriteBoolBit(vbp.IsDestroyed)
+
+	bufBuilder:WriteBoolBit(vbp.IsDestroyed)
 	if vbp.IsDestroyed then
 		return
 	end
@@ -94,9 +91,7 @@ function ValueByPrioritySerializer.BuildInitialInfo(
 	--#tag 타입 정보
 	local typeInfo = vbp.TypeInfo
 	local hasVbpTypeInfo = typeInfo ~= nil
-	local typeName = if hasVbpTypeInfo
-		then typeInfo.Name
-		else typeof(vbp.DefaultValue)
+	local typeName = if hasVbpTypeInfo then typeInfo.Name else typeof(vbp.DefaultValue)
 
 	if not hasVbpTypeInfo then
 		typeInfo = TypeInfos.GetTypeInfoByTypeName(typeName)
@@ -108,9 +103,9 @@ function ValueByPrioritySerializer.BuildInitialInfo(
 		ValueByPrioritySerializer._buildTypeInfo(bufBuilder, typeInfo)
 	end
 
-		bufBuilder:WriteType(typeInfo, vbp:GetDefaultValue())
+	bufBuilder:WriteType(typeInfo, vbp:GetDefaultValue())
 
-		if hasNodes then
+	if hasNodes then
 		bufBuilder:WriteU16(nodeCount) -- 노드 개수 (2 bytes)
 
 		for i = 1, nodeCount do
@@ -136,11 +131,9 @@ function ValueByPrioritySerializer._buildInitialNodeInfo(
 	-- Core
 	bufBuilder:WriteU16(node._nodeId)
 	bufBuilder:WriteF64(node.Priority)
-	
-	ValueByPrioritySerializer._buildNodeFunctionInfo(
-		bufBuilder, node.NodeFunction
-	)
-	
+
+	ValueByPrioritySerializer._buildNodeFunctionInfo(bufBuilder, node.NodeFunction)
+
 	ValueByPrioritySerializer._buildInitialNodeValueInfo(
 		bufBuilder,
 		node,
@@ -148,10 +141,8 @@ function ValueByPrioritySerializer._buildInitialNodeInfo(
 		typeInfo,
 		excludesTypeId
 	)
-	
-	ValueByPrioritySerializer._buildInitialNodeCustomDataInfo(
-		bufBuilder, node
-	)
+
+	ValueByPrioritySerializer._buildInitialNodeCustomDataInfo(bufBuilder, node)
 end
 
 --#tag NodeFunction
@@ -183,13 +174,13 @@ function ValueByPrioritySerializer._buildInitialNodeValueInfo(
 	excludesTypeId: boolean?
 )
 	-- vbp 타입 우선, 없으면 값의 타입 사용
-	local nodeValueTypeInfo 
-	if hasDefinedVbpTypeInfo then 
+	local nodeValueTypeInfo
+	if hasDefinedVbpTypeInfo then
 		nodeValueTypeInfo = vbpTypeInfo
-	else 
+	else
 		nodeValueTypeInfo = TypeInfos.GetTypeInfoByValueType(node.Value)
 	end
-	
+
 	--[[
 		NodeFunction 이 Set 이고 Vbp 에 TypeInfo 가 정의되어있다면,
 		Set 인 노드들의 Value도 해당 TypeInfo 에 맞게 설정됩니다.
@@ -202,8 +193,8 @@ function ValueByPrioritySerializer._buildInitialNodeValueInfo(
 	if not excludesTypeId and (not hasDefinedVbpTypeInfo or node.NodeFunction ~= "Set") then
 		ValueByPrioritySerializer._buildTypeInfo(bufBuilder, nodeValueTypeInfo)
 	end
-	
-	bufBuilder:WriteType(nodeValueTypeInfo, node.Value) 
+
+	bufBuilder:WriteType(nodeValueTypeInfo, node.Value)
 end
 
 --#tag CustomData
@@ -228,7 +219,7 @@ function ValueByPrioritySerializer.ApplyInitialInfo(
 )
 	local params = params or {}
 
-		local isDestroyed = bufReader:ReadBoolBit()
+	local isDestroyed = bufReader:ReadBoolBit()
 	if isDestroyed then
 		vbp:Destroy()
 		return
@@ -244,16 +235,16 @@ function ValueByPrioritySerializer.ApplyInitialInfo(
 			vbpTypeInfo = ValueByPrioritySerializer._readTypeInfo(bufReader)
 		end
 	end
-	
+
 	if not vbpTypeInfo then
 		local defaultTypeName = typeof(vbp.DefaultValue)
 		vbpTypeInfo = TypeInfos.GetTypeInfoByTypeName(defaultTypeName)
 	end
 
-		local defaultValue = bufReader:ReadType(vbpTypeInfo)
+	local defaultValue = bufReader:ReadType(vbpTypeInfo)
 	vbp:SetDefaultValue(defaultValue)
 
-		if hasNodes then
+	if hasNodes then
 		local nodeCount = bufReader:ReadU16()
 
 		for _ = 1, nodeCount do
@@ -278,7 +269,7 @@ function ValueByPrioritySerializer._readTypeInfo(
 		-- Enum 타입 Id 추가 읽기
 		local enumTypeId = bufReader:ReadU8()
 		local enumTypeName = enumTypeNamesById[enumTypeId]
-		if not enumTypeName then 
+		if not enumTypeName then
 			error(`Invalid Enum Type Id received: {enumTypeId}`)
 		end
 		typeInfo = TypeInfos.GetTypeInfoByTypeName(enumTypeName)
@@ -291,8 +282,8 @@ function ValueByPrioritySerializer._readTypeInfo(
 		typeInfo = TypeInfos.GetTypeInfoByTypeName(typeName)
 	end
 
-	if not typeInfo then 
-		error(`Failed to get TypeInfo from Id logic.`) 
+	if not typeInfo then
+		error(`Failed to get TypeInfo from Id logic.`)
 	end
 	return typeInfo
 end
@@ -306,7 +297,7 @@ function ValueByPrioritySerializer._applyInitialNodeInfo(
 )
 	local nodeId = bufReader:ReadU16()
 	local priority = bufReader:ReadF64()
-	
+
 	local nodeFunction = ValueByPrioritySerializer._readNodeFunctionInfo(bufReader)
 	local nodeValue = ValueByPrioritySerializer._readInitialNodeValueInfo(
 		bufReader,
@@ -335,7 +326,9 @@ function ValueByPrioritySerializer._readNodeFunctionInfo(
 	if funcTypeFlag == 0 then -- 기본 NodeFunction 문자열
 		local funcId = bufReader:ReadU8()
 		local funcName = nodeFunctionNamesById[funcId]
-		if not funcName then error(`Invalid NodeFunction Id received: {funcId}`) end
+		if not funcName then
+			error(`Invalid NodeFunction Id received: {funcId}`)
+		end
 		return funcName
 	elseif funcTypeFlag == 1 then -- 커스텀 NodeFunction 모듈 스크립트
 		local repId = bufReader:ReadU32()
@@ -344,7 +337,7 @@ function ValueByPrioritySerializer._readNodeFunctionInfo(
 		if not moduleScript then
 			error(`NodeFunction ModuleScript with Id {repId} not found yet.`)
 		end
-		
+
 		return moduleScript
 	else
 		error(`Invalid NodeFunction type flag received: {funcTypeFlag}`)
@@ -379,10 +372,10 @@ function ValueByPrioritySerializer._readInitialNodeValueInfo(
 		error(`Cannot determine NodeValue type.`)
 	end
 
-	if not nodeValueTypeInfo then 
-		error(`Failed to determine NodeValue TypeInfo.`) 
+	if not nodeValueTypeInfo then
+		error(`Failed to determine NodeValue TypeInfo.`)
 	end
-	
+
 	local nodeValue = bufReader:ReadType(nodeValueTypeInfo)
 	return nodeValue
 end
@@ -424,15 +417,15 @@ function ValueByPrioritySerializer.BuildVbpChangeInfo(
 	params: BuildVbpChangeInfoParams?
 )
 	local params = params or {}
-	
+
 	-- 비트 마스크
 	local isDestroyed = changeInfo.IsDestroyed == true
 	local isDefaultValueChanged = changeInfo.DefaultValue ~= nil
-	local hasReliableChanges = 
-		changeInfo.ReliableNodeChangeInfosById and next(changeInfo.ReliableNodeChangeInfosById) ~= nil
-	local hasUnreliableChanges =
-		changeInfo.UnreliableNodeChangeInfosById and next(changeInfo.UnreliableNodeChangeInfosById) ~= nil
-	
+	local hasReliableChanges = changeInfo.ReliableNodeChangeInfosById
+		and next(changeInfo.ReliableNodeChangeInfosById) ~= nil
+	local hasUnreliableChanges = changeInfo.UnreliableNodeChangeInfosById
+		and next(changeInfo.UnreliableNodeChangeInfosById) ~= nil
+
 	bufBuilder:WriteBoolBit(isDestroyed)
 	bufBuilder:WriteBoolBit(isDefaultValueChanged)
 	bufBuilder:WriteBoolBit(hasReliableChanges)
@@ -442,33 +435,38 @@ function ValueByPrioritySerializer.BuildVbpChangeInfo(
 	if isDefaultValueChanged then
 		local value = mapNilIdentifierToNil(changeInfo.DefaultValue)
 
-		local typeInfoForSerialization = 
-			params.VbpTypeInfo
+		local typeInfoForSerialization = params.VbpTypeInfo
 			or TypeInfos.GetTypeInfoByValueType(value)
-		
+
 		if params.VbpTypeInfo and not params.ExcludesTypeId then
 			-- VbpTypeInfo 가 있다면 그것을 우선 사용하고, Exclude 가 아닐때만 ID 기록
 			ValueByPrioritySerializer._buildTypeInfo(bufBuilder, typeInfoForSerialization)
 		end
 		bufBuilder:WriteType(typeInfoForSerialization, value)
 	end
-	
+
 	if hasReliableChanges then
 		ValueByPrioritySerializer._buildReliableChangeInfos(
-			bufBuilder, changeInfo.ReliableNodeChangeInfosById :: any, params
+			bufBuilder,
+			changeInfo.ReliableNodeChangeInfosById :: any,
+			params
 		)
 	end
-	
+
 	if hasUnreliableChanges then
 		ValueByPrioritySerializer._buildUnreliableChangeInfos(
-			bufBuilder, changeInfo.UnreliableNodeChangeInfosById :: any, params
+			bufBuilder,
+			changeInfo.UnreliableNodeChangeInfosById :: any,
+			params
 		)
 	end
 end
 
 function ValueByPrioritySerializer._buildReliableChangeInfos(
 	bufBuilder: BufferBuilder.BufferBuilder,
-	reliableNodeInfos: { [number]: ValueByPriorityObserver.ReliableNodeChangeInfo },
+	reliableNodeInfos: {
+		[number]: ValueByPriorityObserver.ReliableNodeChangeInfo,
+	},
 	params: BuildVbpChangeInfoParams
 )
 	local reliableNodeCount = TableUtil.count(reliableNodeInfos)
@@ -476,11 +474,7 @@ function ValueByPrioritySerializer._buildReliableChangeInfos(
 
 	for nodeId, nodeChangeInfo in reliableNodeInfos do
 		bufBuilder:WriteU16(nodeId)
-		ValueByPrioritySerializer._buildReliableNodeChangeInfo(
-			bufBuilder,
-			nodeChangeInfo,
-			params
-		)
+		ValueByPrioritySerializer._buildReliableNodeChangeInfo(bufBuilder, nodeChangeInfo, params)
 	end
 end
 
@@ -489,7 +483,6 @@ function ValueByPrioritySerializer._buildReliableNodeChangeInfo(
 	nodeChangeInfo: ValueByPriorityObserver.ReliableNodeChangeInfo,
 	params: BuildVbpChangeInfoParams
 )
-
 	local isDestroyed = nodeChangeInfo.IsDestroyed == true
 	local isAdded = nodeChangeInfo.IsAdded == true
 	local isPriorityChanged = nodeChangeInfo.Priority ~= nil
@@ -506,13 +499,8 @@ function ValueByPrioritySerializer._buildReliableNodeChangeInfo(
 	if isDestroyed then
 		-- 노드가 파괴된 경우, 추가 정보는 의미가 없으므로 기록하지 않습니다
 		return
-		
 	elseif isAdded then
-		ValueByPrioritySerializer._buildNodeChangeInfoOnAdded(
-			bufBuilder,
-			nodeChangeInfo,
-			params
-		)
+		ValueByPrioritySerializer._buildNodeChangeInfoOnAdded(bufBuilder, nodeChangeInfo, params)
 	else
 		ValueByPrioritySerializer._buildNodeChangeInfoOnChanged(
 			bufBuilder,
@@ -536,10 +524,7 @@ function ValueByPrioritySerializer._buildNodeChangeInfoOnAdded(
 
 	local nodeFunc = nodeChangeInfo.NodeFunction
 	local isSetNodeFunction = nodeFunc == "Set"
-	ValueByPrioritySerializer._buildNodeFunctionInfo(
-		bufBuilder, 
-		nodeChangeInfo.NodeFunction :: any
-	)
+	ValueByPrioritySerializer._buildNodeFunctionInfo(bufBuilder, nodeChangeInfo.NodeFunction :: any)
 
 	local value = mapNilIdentifierToNil(nodeChangeInfo.Value)
 	local typeInfoForSerialization
@@ -572,8 +557,6 @@ function ValueByPrioritySerializer._buildNodeCustomDataOnAdded(
 	end
 end
 
-
-
 --#tag Change
 function ValueByPrioritySerializer._buildNodeChangeInfoOnChanged(
 	bufBuilder: BufferBuilder.BufferBuilder,
@@ -584,7 +567,7 @@ function ValueByPrioritySerializer._buildNodeChangeInfoOnChanged(
 	params: BuildVbpChangeInfoParams
 )
 	-- 기존 노드가 업데이트된 경우, 변경된 필드의 정보만 기록합니다.
-	
+
 	if isValueChanged then
 		--[[
 			대부분의 경우엔 NodeFunction 은 필요하지 않습니다, 
@@ -598,7 +581,7 @@ function ValueByPrioritySerializer._buildNodeChangeInfoOnChanged(
 		]]
 		local isSetNodeFunction = nodeChangeInfo.NodeFunction == "Set"
 		bufBuilder:WriteBoolBit(isSetNodeFunction)
-		
+
 		ValueByPrioritySerializer._buildNodeValue(
 			bufBuilder,
 			nodeChangeInfo.Value,
@@ -610,17 +593,17 @@ function ValueByPrioritySerializer._buildNodeChangeInfoOnChanged(
 	if isCustomDataChanged then
 		ValueByPrioritySerializer._buildNodeCustomData(bufBuilder, nodeChangeInfo.CustomData :: any)
 	end
-	
+
 	if isPriorityChanged then
 		bufBuilder:WriteF64(nodeChangeInfo.Priority)
 	end
 end
 
-
-
 function ValueByPrioritySerializer._buildUnreliableChangeInfos(
 	bufBuilder: BufferBuilder.BufferBuilder,
-	unreliableNodeInfosById: { [number]: ValueByPriorityObserver.UnreliableNodeChangeInfo },
+	unreliableNodeInfosById: {
+		[number]: ValueByPriorityObserver.UnreliableNodeChangeInfo,
+	},
 	params: BuildVbpChangeInfoParams
 )
 	local unreliableNodeCount = TableUtil.count(unreliableNodeInfosById)
@@ -628,11 +611,7 @@ function ValueByPrioritySerializer._buildUnreliableChangeInfos(
 
 	for nodeId, nodeChangeInfo in unreliableNodeInfosById do
 		bufBuilder:WriteU16(nodeId)
-		ValueByPrioritySerializer._buildUnreliableNodeChangeInfo(
-			bufBuilder,
-			nodeChangeInfo,
-			params
-		)
+		ValueByPrioritySerializer._buildUnreliableNodeChangeInfo(bufBuilder, nodeChangeInfo, params)
 	end
 end
 
@@ -649,21 +628,17 @@ function ValueByPrioritySerializer._buildUnreliableNodeChangeInfo(
 
 	if isValueChanged then
 		ValueByPrioritySerializer._buildNodeValue(
-			bufBuilder, 
-			mapNilIdentifierToNil(nodeChangeInfo.Value), 
-			nodeChangeInfo.NodeFunction :: any, 
+			bufBuilder,
+			mapNilIdentifierToNil(nodeChangeInfo.Value),
+			nodeChangeInfo.NodeFunction :: any,
 			params
 		)
 	end
-	
+
 	if isCustomDataChanged then
-		ValueByPrioritySerializer._buildNodeCustomData(
-			bufBuilder, 
-			nodeChangeInfo.CustomData :: any
-		)
+		ValueByPrioritySerializer._buildNodeCustomData(bufBuilder, nodeChangeInfo.CustomData :: any)
 	end
 end
-
 
 --#region ApplyVbpChangeInfo
 export type ApplyVbpChangeInfoParams = {
@@ -697,10 +672,11 @@ function ValueByPrioritySerializer.ApplyVbpChangeInfo(
 			-- 타입 ID가 기록되었을 것으로 예상되므로 읽습니다.
 			typeInfoToRead = ValueByPrioritySerializer._readTypeInfo(bufReader)
 			-- 읽은 타입과 VbpTypeInfo가 다르면 잠재적 오류지만, 일단 진행합니다.
-			 assert(typeInfoToRead == params.VbpTypeInfo, "Mismatch VbpTypeInfo")
+			assert(typeInfoToRead == params.VbpTypeInfo, "Mismatch VbpTypeInfo")
 		else
 			-- 타입 ID가 기록되지 않았으므로 VbpTypeInfo 또는 현재 값 타입을 사용합니다.
-			typeInfoToRead = params.VbpTypeInfo or TypeInfos.GetTypeInfoByTypeName(typeof(vbp:GetDefaultValue()))
+			typeInfoToRead = params.VbpTypeInfo
+				or TypeInfos.GetTypeInfoByTypeName(typeof(vbp:GetDefaultValue()))
 		end
 		local value = bufReader:ReadType(typeInfoToRead)
 		vbp:SetDefaultValue(value)
@@ -725,12 +701,7 @@ function ValueByPrioritySerializer._applyReliableChangeInfos(
 	local reliableNodeCount = bufReader:ReadU16()
 	for _ = 1, reliableNodeCount do
 		local nodeId = bufReader:ReadU16()
-		ValueByPrioritySerializer._applyReliableNodeChangeInfo(
-			bufReader,
-			vbp,
-			nodeId,
-			params
-		)
+		ValueByPrioritySerializer._applyReliableNodeChangeInfo(bufReader, vbp, nodeId, params)
 	end
 end
 
@@ -750,8 +721,8 @@ function ValueByPrioritySerializer._applyReliableNodeChangeInfo(
 	local isCustomDataChanged = bufReader:ReadBoolBit()
 
 	if isDestroyed then
-		if node then 
-			node:Destroy() 
+		if node then
+			node:Destroy()
 		end
 		-- 노드가 파괴된 경우, 추가 데이터가 없어야하며, 그렇기에 읽지 않습니다.
 		return
@@ -773,7 +744,9 @@ function ValueByPrioritySerializer._applyReliableNodeChangeInfo(
 			노드 동기화가 안된 경우
 			업데이트할 노드가 없는 경우, 기록된 데이터를 읽고 무시합니다.
 		]]
-		warn(`존재하지 않거나 파괴된 노드 Id {nodeId}의 업데이트 시도. 변경사항을 건너뜁니다.`)
+		warn(
+			`존재하지 않거나 파괴된 노드 Id {nodeId}의 업데이트 시도. 변경사항을 건너뜁니다.`
+		)
 		ValueByPrioritySerializer._skipNodeChangeInfoOnChanged(
 			bufReader,
 			isPriorityChanged,
@@ -798,10 +771,10 @@ function ValueByPrioritySerializer._applyNodeChangeInfoOnAdded(
 	local customData = ValueByPrioritySerializer._readNodeCustomDataOnAdded(bufReader)
 
 	vbp:AddNode({
-		Value = value, 
+		Value = value,
 		Priority = priority,
 		NodeFunction = nodeFunction,
-		CustomData = customData, 
+		CustomData = customData,
 		_bakedNodeId = nodeId,
 	})
 end
@@ -818,7 +791,6 @@ function ValueByPrioritySerializer._readNodeCustomDataOnAdded(
 	return ValueByPrioritySerializer._readNodeCustomData(bufReader)
 end
 
-
 --#tag Change
 function ValueByPrioritySerializer._applyNodeChangeInfoOnChanged(
 	bufReader: BufferReader.BufferReader,
@@ -830,12 +802,12 @@ function ValueByPrioritySerializer._applyNodeChangeInfoOnChanged(
 )
 	if isValueChanged then
 		-- isSetNodeFunction 비트는
-		-- Skip 시 타입 Id 읽기 여부를 위한 비트이기에 여기엔 필요없지만, 
+		-- Skip 시 타입 Id 읽기 여부를 위한 비트이기에 여기엔 필요없지만,
 		-- 혹시 모르니까 비트 단위로도 커서를 맞춰줍니다
-		local _isSetNodeFunction = bufReader:ReadBoolBit() 
-		
+		local _isSetNodeFunction = bufReader:ReadBoolBit()
+
 		local value = ValueByPrioritySerializer._readNodeValue(bufReader, node.NodeFunction, params)
-		
+
 		if params.SerializedTime and params.SerializedTime <= node._valueChangedTime then
 			return
 		end
@@ -850,7 +822,7 @@ function ValueByPrioritySerializer._applyNodeChangeInfoOnChanged(
 			end
 		end
 	end
-	
+
 	if isPriorityChanged then
 		local priority = bufReader:ReadF64()
 		node:SetPriority(priority)
@@ -872,9 +844,7 @@ function ValueByPrioritySerializer._skipNodeChangeInfoOnChanged(
 )
 	if isValueChanged then
 		local isSetNodeFunction = bufReader:ReadBoolBit()
-		local fakeNodeFunction = if isSetNodeFunction
-			then "Set"
-			else "Multiply"
+		local fakeNodeFunction = if isSetNodeFunction then "Set" else "Multiply"
 		local value = ValueByPrioritySerializer._readNodeValue(bufReader, fakeNodeFunction, params)
 	end
 
@@ -887,7 +857,6 @@ function ValueByPrioritySerializer._skipNodeChangeInfoOnChanged(
 	end
 end
 
-
 function ValueByPrioritySerializer._applyUnreliableChangeInfos(
 	bufReader: BufferReader.BufferReader,
 	vbp: ValueByPriority.ValueByPriority,
@@ -896,12 +865,7 @@ function ValueByPrioritySerializer._applyUnreliableChangeInfos(
 	local unreliableNodeCount = bufReader:ReadU16()
 	for _ = 1, unreliableNodeCount do
 		local nodeId = bufReader:ReadU16()
-		ValueByPrioritySerializer._applyUnreliableNodeChangeInfo(
-			bufReader,
-			vbp,
-			nodeId,
-			params
-		)
+		ValueByPrioritySerializer._applyUnreliableNodeChangeInfo(bufReader, vbp, nodeId, params)
 	end
 end
 
@@ -912,10 +876,10 @@ function ValueByPrioritySerializer._applyUnreliableNodeChangeInfo(
 	params: ApplyVbpChangeInfoParams
 )
 	local node = vbp.NodesById[nodeId]
-	
+
 	local isValueChanged = bufReader:ReadBoolBit()
 	local isCustomDataChanged = bufReader:ReadBoolBit()
-	
+
 	if isValueChanged then
 		local value = ValueByPrioritySerializer._readNodeValue(bufReader, node.NodeFunction, params)
 		node:SetValue(value)
@@ -942,7 +906,7 @@ function ValueByPrioritySerializer._buildNodeValue(
 	local isSetNodeFunction = nodeFunction == "Set"
 
 	local typeInfoForSerialization
-	
+
 	--[[
 		NodeFunction 이 Set 이고 Vbp 에 TypeInfo 가 정의되어있다면,
 		Set 인 노드들의 Value도 해당 TypeInfo 에 맞게 설정됩니다.
@@ -1008,7 +972,7 @@ function ValueByPrioritySerializer._buildNodeCustomData(
 
 		-- CustomData 값은 VbpTypeInfo의 영향을 받지 않으므로 항상 실제 값의 타입 ID를 기록합니다.
 		local typeInfo = TypeInfos.GetTypeInfoByTypeName(typeof(value))
-		ValueByPrioritySerializer._buildTypeInfo(bufBuilder, typeInfo) 
+		ValueByPrioritySerializer._buildTypeInfo(bufBuilder, typeInfo)
 		bufBuilder:WriteType(typeInfo, value)
 	end
 end
@@ -1029,9 +993,7 @@ function ValueByPrioritySerializer._readNodeCustomData(
 		local typeInfo = ValueByPrioritySerializer._readTypeInfo(bufReader)
 		local value = bufReader:ReadType(typeInfo)
 
-		changedData[key] = if mapsNilToNilIdentifier and value == nil
-			then NIL_IDENTIFIER
-			else value
+		changedData[key] = if mapsNilToNilIdentifier and value == nil then NIL_IDENTIFIER else value
 	end
 
 	return changedData
@@ -1053,6 +1015,5 @@ function ValueByPrioritySerializer._buildTypeInfo(
 		bufBuilder:WriteU8(enumTypeId)
 	end
 end
-
 
 return ValueByPrioritySerializer
