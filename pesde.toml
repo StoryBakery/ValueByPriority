@@ -32,6 +32,7 @@ Signal = { repo = "https://github.com/StoryBakery/Signal", rev = "15e95d125e3c7c
 Maid = { repo = "https://github.com/StoryBakery/Maid", rev = "0fc3dddb5b709f30c90cf0d63f031113c26ce207" }
 LinearInterpolation = { repo = "https://github.com/StoryBakery/LinearInterpolation", rev = "c522819b5515edb45f1518244252f58c8f9e05ee" }
 TypeInfos = { repo = "https://github.com/StoryBakery/TypeInfos", rev = "a7362072a5afd85bee6583f05398a09438a039b5" }
+promise = { wally = "evaera/promise", version = "^4.0.0" }
 
 [scripts]
 roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
