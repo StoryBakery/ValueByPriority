@@ -12,7 +12,7 @@ local Promise = require("./roblox_packages/promise")
 local Signal = require("./roblox_packages/Signal")
 local TableUtil = require("./roblox_packages/TableUtil")
 
-local Package = script.Parent
+local Package = script
 
 local Remotes = Package.Remotes
 local syncFromServerEvent = Remotes.SyncFromServerEvent

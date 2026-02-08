@@ -1,5 +1,5 @@
 name = "storybakery/value_by_priority"
-version = "0.1.3"
+version = "0.1.4"
 license = "MIT"
 includes = [
     "pesde.toml",
