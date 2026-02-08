@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local AuroraClock = require("../roblox_packages/AuroraClock")
 local BufferBuilder = require("../roblox_packages/BufferBuilder")
 local BufferReader = require("../roblox_packages/BufferReader")
 local Maid = require("../roblox_packages/Maid")
@@ -102,7 +101,7 @@ local function processQueuedChangeInfosForPlayer(player: Player)
 		local reliableBuilder = BufferBuilder.new()
 		local vbpCount = TableUtil.count(reliableChangeInfos)
 		reliableBuilder:WriteU16(vbpCount) -- 변경된 VBP 개수 기록
-		reliableBuilder:WriteF64(AuroraClock.GetServerTime())
+		reliableBuilder:WriteF64(time())
 
 		for vbpId, changeInfo in reliableChangeInfos do
 			local vbp = ValueByPriority.FindById(vbpId)
@@ -124,7 +123,7 @@ local function processQueuedChangeInfosForPlayer(player: Player)
 		local unreliableBuilder = BufferBuilder.new()
 		local vbpCount = TableUtil.count(unreliableInfos)
 		unreliableBuilder:WriteU16(vbpCount) -- 변경된 VBP 개수 기록
-		unreliableBuilder:WriteF64(AuroraClock.GetServerTime())
+		unreliableBuilder:WriteF64(time())
 
 		for vbpId, changeInfo in unreliableInfos do
 			local vbp = ValueByPriority.FindById(vbpId)
