@@ -1,0 +1,26 @@
+{
+  "name": "storybakery-docs-site",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "npm run reference:build && bakerywave start",
+    "start": "npm run reference:build && bakerywave start",
+    "build": "npm run reference:build && bakerywave build",
+    "serve": "bakerywave serve",
+    "reference:build": "bakerywave reference build --site-dir ."
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.0.0",
+    "@docusaurus/plugin-content-docs": "^3.0.0",
+    "@docusaurus/plugin-content-pages": "^3.0.0",
+    "@docusaurus/theme-classic": "^3.0.0",
+    "@storybakery/bakerywave": "file:../../../bakerywave/packages/bakerywave",
+    "@storybakery/docs-preset": "file:../../../bakerywave/packages/docs-preset",
+    "@storybakery/docs-theme": "file:../../../bakerywave/packages/docs-theme",
+    "@storybakery/docusaurus-plugin-reference": "file:../../../bakerywave/packages/docusaurus-plugin-reference",
+    "@storybakery/docusaurus-plugin-search-index": "file:../../../bakerywave/packages/docusaurus-plugin-search-index",
+    "@storybakery/luau-docgen": "file:../../../bakerywave/packages/luau-docgen",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

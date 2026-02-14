@@ -81,7 +81,6 @@ local function cleanupObserverContextsByPlayer(player: Player)
 	end
 end
 
---#region Change Process
 --[[
 	매 Heartbeat마다 큐에 쌓인 모든 플레이어의 VBP 변경 사항들을 일괄적으로 직렬화하고 전송합니다.
 	이를 통해 RemoteEvent 호출 빈도를 줄여 네트워크 부하를 최적화합니다.
@@ -166,7 +165,6 @@ end
 
 RunService.Heartbeat:Connect(processQueuedChangeInfos)
 
---#region Player Removing
 --[[
 	플레이어가 게임에서 나갈 경우, 해당 플레이어와 관련된 모든 동기화 정보(Observer 컨텍스트, 변경 사항 큐 등)를
 	정리하여 메모리 누수를 방지합니다.
@@ -187,7 +185,6 @@ end
 
 Players.PlayerRemoving:Connect(onPlayerRemoving)
 
---#region Change Queue
 --[[
 	VBP 객체에서 발생한 변경 사항을 해당 플레이어의 전송 큐에 추가합니다.
 	큐에 추가된 정보는 다음 Heartbeat 주기에 일괄 처리됩니다.
@@ -244,8 +241,6 @@ local function queueVbpChanges(
 	end
 end
 
---#1 Request
---#region Sync
 --[[
 	클라이언트로부터 VBP 동기화 시작 요청을 받으면, 해당 VBP에 대한 Observer를 설정하고
 	초기 상태 정보를 클라이언트로 전송합니다. 이후 변경 사항은 큐를 통해 관리됩니다.
@@ -350,7 +345,6 @@ end
 
 RunService.Heartbeat:Connect(sendQueuedInitialBuffers)
 
---#region Desync
 --[[
 	클라이언트로부터 VBP 동기화 해제 요청을 받으면, 해당 VBP에 대한 Observer 컨텍스트를 정리하여
 	더 이상 해당 클라이언트에게 업데이트를 전송하지 않도록 합니다.

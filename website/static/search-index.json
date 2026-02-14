@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-02-13T13:44:57.738Z",
+  "categories": [],
+  "entries": [
+    {
+      "id": "manual/index.md",
+      "title": "Overview",
+      "url": "/manual",
+      "section": "manual",
+      "category": "",
+      "type": "doc",
+      "excerpt": "Overview This is the manual documentation area.",
+      "content": "Overview This is the manual documentation area."
+    },
+    {
+      "id": "reference/index.md",
+      "title": "Reference",
+      "url": "/reference",
+      "section": "reference",
+      "category": "",
+      "type": "doc",
+      "excerpt": "Reference Generated API docs go here.",
+      "content": "Reference Generated API docs go here."
+    }
+  ]
+}

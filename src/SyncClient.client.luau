@@ -1,5 +1,4 @@
 --[[
-	동작 참고:
 	Vbp를 찾을 수 없는 경우, 이 VBP에 대한 나머지 데이터를 건너뛰어야 합니다.
 	임시 Vbp 를 만들어 스킵합니다.
 ]]
@@ -51,8 +50,6 @@ end
 
 ApplyInitialVbpEvent.OnClientEvent:Connect(onApplyInitialVbpEvent)
 
---#region Change
-
 local function findVbpAndApplyChangeFromReaderWithChangeType(
 	reader: BufferReader.BufferReader,
 	changeType: string,
@@ -85,10 +82,6 @@ local function findVbpAndApplyChangeFromReaderWithChangeType(
 	end
 end
 
---[[
-	서버로부터 수신된 VBP 변경 사항 (신뢰성 있는 데이터)을 처리합니다.
-]]
-
 local function onReceiveReliableChanges(buf: buffer)
 	local reader = BufferReader.fromBuffer(buf)
 	local vbpCount = reader:ReadU16() -- 변경된 VBP 개수
@@ -100,10 +93,6 @@ local function onReceiveReliableChanges(buf: buffer)
 end
 
 SyncFromServerEvent.OnClientEvent:Connect(onReceiveReliableChanges)
-
---[[
-	서버로부터 수신된 VBP 변경 사항 (신뢰성 없는 데이터)을 처리합니다.
-]]
 
 local function onReceiveUnreliableChanges(buf: buffer)
 	local reader = BufferReader.fromBuffer(buf)

@@ -25,12 +25,12 @@ default = "https://github.com/UpliftGames/wally-index"
 
 [dependencies]
 BufferBuilder = { repo = "https://github.com/StoryBakery/BufferBuilder", rev = "02a2fb0180137fce712100a8b205ef4b8d5e5752" }
-BufferReader = { repo = "https://github.com/StoryBakery/BufferReader", rev = "main" }
+BufferReader = { repo = "https://github.com/StoryBakery/BufferReader", rev = "b398d6f399a8f2910963eacedb8d05282aaf958a" }
 ReplicatedInstanceId = { repo = "https://github.com/StoryBakery/ReplicatedInstanceId", rev = "acf7dc27b7dfd6058aaf8b29833f132a71c0e445" }
 TableUtil = { repo = "https://github.com/StoryBakery/TableUtil", rev = "961700292dd382b062955e16cac7ccccc361cdfa" }
-Signal = { repo = "https://github.com/StoryBakery/Signal", rev = "15e95d125e3c7c1a487c86da30608c5f7dc4b1f3" }
-Maid = { repo = "https://github.com/StoryBakery/Maid", rev = "0fc3dddb5b709f30c90cf0d63f031113c26ce207" }
-LinearInterpolation = { repo = "https://github.com/StoryBakery/LinearInterpolation", rev = "c522819b5515edb45f1518244252f58c8f9e05ee" }
+Signal = { repo = "https://github.com/StoryBakery/Signal", rev = "6b736fa475ea571a0cb488b7ffbcc0f775d9fb5a" }
+Maid = { repo = "https://github.com/StoryBakery/Maid", rev = "d23aca3d40f14b4f08ff83f33119094de1b9e819" }
+LinearInterpolation = { repo = "https://github.com/StoryBakery/LinearInterpolation", rev = "4b5dfbedba536567f3d494e519ddbb71360dbf5a" }
 TypeInfos = { repo = "https://github.com/StoryBakery/TypeInfos", rev = "a7362072a5afd85bee6583f05398a09438a039b5" }
 promise = { wally = "evaera/promise", version = "^4.0.0" }
 
@@ -47,3 +47,9 @@ rojo = { name = "pesde/rojo", version = "^7.5.1", target = "lune" }
 [engines]
 pesde = "^0.7.0"
 lune = "^0.10.2"
+
+[overrides]
+"BufferBuilder>BufferReader" = "BufferReader"
+"Maid>Signal" = "Signal"
+"TypeInfos>ReplicatedInstanceId" = "ReplicatedInstanceId"
+"TypeInfos>TableUtil" = "TableUtil"
